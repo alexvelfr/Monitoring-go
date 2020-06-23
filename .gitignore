@@ -2,3 +2,4 @@ cmd/monitoring/configs
 .vscode
 .env
 /monitoring
+vendor

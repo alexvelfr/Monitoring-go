@@ -60,7 +60,7 @@ func main() {
 
 	dispatcher := monitoring.CreateDispatcher()
 
-	go http.ListenAndServe("0.0.0.0:8443", nil)
+	go http.ListenAndServe("0.0.0.0:8444", nil)
 	go monitoring.CheckBlocks()
 
 	dispatcher.AddCommandHandler("start", monitoring.StartCommandHandler)
