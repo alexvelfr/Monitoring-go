@@ -52,7 +52,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err.Error())
 	}
-	w.Header().Add("Content-Type", "application/json")
 	w.Write(resBt)
 }
 
@@ -78,6 +77,5 @@ func MailingHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err.Error())
 	}
-	w.Header().Add("Content-Type", "application/json")
 	w.Write(resBt)
 }

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/alexvelfr/Monitoring-go/internal/app/monitoring"
+	"github.com/alexvelfr/Monitoring-go/internal/auth"
 	"github.com/alexvelfr/Monitoring-go/internal/store"
 	"github.com/gorilla/mux"
 	"github.com/jasonlvhit/gocron"
@@ -51,10 +52,11 @@ func main() {
 		createBaseConfig()
 	}
 
-	router := mux.NewRouter()
-
-	router.HandleFunc("/core/set-control-point", monitoring.IndexHandler).Methods(http.MethodPost)
-	router.HandleFunc("/core/mailing", monitoring.MailingHandler).Methods(http.MethodPost)
+	router := mux.NewRouter().StrictSlash(true)
+	core := router.PathPrefix("/core").Subrouter()
+	core.Use(auth.BearerAuth)
+	core.HandleFunc("/set-control-point", monitoring.IndexHandler).Methods(http.MethodPost)
+	core.HandleFunc("/mailing", monitoring.MailingHandler).Methods(http.MethodPost)
 
 	http.Handle("/", router)
 
