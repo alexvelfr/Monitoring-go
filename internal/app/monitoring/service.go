@@ -44,7 +44,7 @@ func processReturnInReglament(reglament models.Reglament) {
 
 func getReglamentTime(bl *block, conf *config) (int, string) {
 	now := time.Now().Hour()
-	if now >= conf.Period.Start && now <= conf.Period.End {
+	if now >= conf.Period.Start && now < conf.Period.End {
 		return bl.ControlDay, "День"
 	}
 	return bl.ControlNight, "Ночь"
