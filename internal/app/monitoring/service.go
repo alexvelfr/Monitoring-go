@@ -66,7 +66,7 @@ func processServiceMessage(data *requestMailing) {
 	if data.Params.Service.Status == "up" {
 		var reglament models.Reglament
 		store.DbStore.DB.QueryRowx(reglament.GetBlockQuery(), BLOCK1C).StructScan(&reglament)
-		if reglament.ID == 0 {
+		if reglament.ID == 0 || reglament.InReglament {
 			return
 		}
 		downtime := int(time.Now().Sub(reglament.LastUpdated).Seconds())
