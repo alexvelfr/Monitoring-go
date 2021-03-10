@@ -41,7 +41,7 @@ func (d *Dispatcher) Dispatch(update tgbotapi.Update) tgbotapi.MessageConfig {
 	if update.CallbackQuery != nil {
 		return d.processCallback(update.CallbackQuery)
 	}
-	if update.Message.Contact != nil {
+	if update.Message != nil && update.Message.Contact != nil {
 		return d.contactHandler(update.Message)
 	}
 	return tgbotapi.MessageConfig{}
