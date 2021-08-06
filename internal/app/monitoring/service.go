@@ -69,7 +69,8 @@ func processServiceMessage(data *requestMailing) {
 		if reglament.ID == 0 || reglament.InReglament {
 			return
 		}
-		downtime := int(time.Now().Sub(reglament.LastUpdated).Seconds())
+
+		downtime := int(time.Since(reglament.LastUpdated).Seconds())
 		//Добавим сообщение о времени простоя сервиса
 		data.Params.Message = data.Params.Message + fmt.Sprintf("\nВремя простоя: %d мин.", int(downtime/60))
 		statistic := &models.Statistic{

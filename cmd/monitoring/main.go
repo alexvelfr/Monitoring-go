@@ -61,6 +61,7 @@ func main() {
 	http.Handle("/", router)
 
 	dispatcher := monitoring.CreateDispatcher()
+	defer store.DbStore.Close()
 
 	go http.ListenAndServe("0.0.0.0:8444", nil)
 	go monitoring.CheckBlocks()

@@ -26,7 +26,7 @@ func StartCommandHandler(message *tgbotapi.Message) tgbotapi.MessageConfig {
 		_, err := store.DbStore.DB.NamedExec(`INSERT INTO users (name, phone, telegram_id, send_messages, send_reports, is_admin) 
 								VALUES (:name, :phone, :telegram_id, :send_messages, :send_reports, :is_admin)`, user)
 		if err != nil {
-			log.Printf(err.Error())
+			log.Println(err.Error())
 		}
 	}
 	return msg

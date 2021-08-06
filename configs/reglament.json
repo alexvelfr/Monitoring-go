@@ -3,8 +3,7 @@
     "start": 8,
     "end": 22
   },
-  "documents": [
-    {
+  "documents": [{
       "id": "Заявка на займ",
       "controlDay": 10,
       "controlNight": 30
@@ -21,6 +20,11 @@
     },
     {
       "id": "Погашения",
+      "controlDay": 10,
+      "controlNight": 60
+    },
+    {
+      "id": "BankID",
       "controlDay": 10,
       "controlNight": 60
     }

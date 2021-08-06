@@ -24,6 +24,7 @@ var docMapping = map[string]string{
 	"prolongation": "Пролонгация",
 	"payment":      "Выдача займа",
 	"refund":       "Погашения",
+	"bankid":       "BankID",
 	"1C":           "1С",
 }
 
