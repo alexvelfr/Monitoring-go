@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/alexvelfr/Monitoring-go/internal/app/monitoring"
 	"github.com/alexvelfr/Monitoring-go/internal/auth"
@@ -11,46 +10,8 @@ import (
 	"github.com/jasonlvhit/gocron"
 )
 
-func createBaseConfig() {
-	os.Mkdir("configs", os.ModePerm)
-	file, _ := os.Create("configs/reglament.json")
-	file.WriteString(`{
-  "period": {
-    "start": 8,
-    "end": 22
-  },
-  "documents": [
-    {
-      "id": "Заявка на займ",
-      "controlDay": 10,
-      "controlNight": 30
-    },
-    {
-      "id": "Пролонгация",
-      "controlDay": 20,
-      "controlNight": 60
-    },
-    {
-      "id": "Выдача займа",
-      "controlDay": 10,
-      "controlNight": 60
-    },
-    {
-      "id": "Погашения",
-      "controlDay": 10,
-      "controlNight": 60
-    }
-  ]
-}
-`)
-	file.Close()
-}
-
 func main() {
 	defer store.DbStore.Close()
-	if _, err := os.Stat("configs"); os.IsNotExist(err) {
-		createBaseConfig()
-	}
 
 	router := mux.NewRouter().StrictSlash(true)
 	core := router.PathPrefix("/core").Subrouter()

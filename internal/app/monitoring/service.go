@@ -8,15 +8,21 @@ import (
 	"github.com/alexvelfr/Monitoring-go/internal/store"
 )
 
-func processDocument(doc *document) {
+func processDocument(doc document) {
 	var reglament models.Reglament
 
-	store.DbStore.DB.QueryRowx(reglament.GetBlockQuery(), doc.Name).StructScan(&reglament)
+	store.DbStore.DB.QueryRowx(reglament.GetBlockByCodeQuery(), doc.Name).StructScan(&reglament)
 
 	if reglament.ID == 0 {
 		reglament.Block = doc.Name
 		reglament.InReglament = true
+		reglament.Active = true
 		reglament.LastUpdated = time.Now()
+		reglament.Code = doc.Name
+		reglament.DayHour = 8
+		reglament.NightHour = 22
+		reglament.ReglamentDayTime = 10
+		reglament.ReglamentNightTime = 60
 		store.DbStore.DB.NamedExec(reglament.GetCreateBlockQuery(), reglament)
 		return
 	}
@@ -42,12 +48,12 @@ func processReturnInReglament(reglament models.Reglament) {
 	SendMassages(fmt.Sprintf("Вернулся к работе блок %s!\nВремя: %s\nВремя простоя: %dмин.", reglament.Block, time.Now().Format("01/02 15:04"), int(downtime/60)))
 }
 
-func getReglamentTime(bl *block, conf *config) (int, string) {
+func getReglamentTime(bl models.Reglament) (int, string) {
 	now := time.Now().Hour()
-	if now >= conf.Period.Start && now < conf.Period.End {
-		return bl.ControlDay, "День"
+	if now >= bl.DayHour && now < bl.NightHour {
+		return bl.ReglamentDayTime, "День"
 	}
-	return bl.ControlNight, "Ночь"
+	return bl.ReglamentNightTime, "Ночь"
 }
 
 func processServiceMessage(data *requestMailing) {
@@ -58,9 +64,6 @@ func processServiceMessage(data *requestMailing) {
 		reglament.Block = BLOCK1C
 		reglament.InReglament = false
 		reglament.LastUpdated = time.Now()
-		if reglament.ID == 0 {
-			store.DbStore.DB.NamedExec(reglament.GetCreateBlockQuery(), &reglament)
-		}
 		store.DbStore.DB.NamedExec(reglament.GetUpdateBlockQuery(), &reglament)
 	}
 	if data.Params.Service.Status == "up" {

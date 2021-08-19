@@ -1,11 +1,8 @@
 package monitoring
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/alexvelfr/Monitoring-go/internal/models"
@@ -13,51 +10,34 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-type block struct {
-	ID           string `json:"id"`
-	ControlDay   int    `json:"controlDay"`
-	ControlNight int    `json:"controlNight"`
-}
-type config struct {
-	Period struct {
-		Start int `json:"start"`
-		End   int `json:"end"`
-	} `json:"period"`
-	Documents []block `json:"documents"`
-}
-
 //CheckBlocks - task which check cache
 func CheckBlocks() {
-	configJSON, err := os.Open(filepath.Join("configs", "reglament.json"))
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var conf config
-	decoder := json.NewDecoder(configJSON)
-	decoder.Decode(&conf)
-	configJSON.Close()
-
+	reglament := &models.Reglament{}
 	for {
-		for _, doc := range conf.Documents {
-			reglament := &models.Reglament{}
-			store.DbStore.DB.QueryRowx(reglament.GetBlockQuery(), doc.ID).StructScan(reglament)
-			if reglament.ID == 0 {
-				// Если блока не существует, создадим его
-				reglament.Block = doc.ID
-				reglament.InReglament = true
-				reglament.LastUpdated = time.Now()
-				store.DbStore.DB.NamedExec(reglament.GetCreateBlockQuery(), reglament)
-				continue
-			}
+		var docs []models.Reglament = make([]models.Reglament, 10)
+		err := store.DbStore.DB.Select(&docs, reglament.GetBlocksQuery())
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		for _, doc := range docs {
 			now := time.Now()
-			downtime := int(now.Sub(reglament.LastUpdated).Minutes())
-			reglamentTime, reglamentName := getReglamentTime(&doc, &conf)
-			if downtime >= reglamentTime && reglament.InReglament {
-				reglament.InReglament = false
-				store.DbStore.DB.NamedExec(reglament.GetUpdateBlockQuery(), reglament)
-				SendMassages(fmt.Sprintf("Блок %s вышел из регламента!\nВремя: %s\nРежим регламента: %s\nВремя регламента: %dмин.", doc.ID, time.Now().Format("01/02 15:04"), reglamentName, reglamentTime))
+			downtime := int(now.Sub(doc.LastUpdated).Minutes())
+			reglamentTime, reglamentName := getReglamentTime(doc)
+			if downtime >= reglamentTime && doc.InReglament {
+				doc.InReglament = false
+				_, err := store.DbStore.DB.NamedExec(reglament.GetUpdateBlockQuery(), &doc)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				SendMassages(
+					fmt.Sprintf("Блок %s вышел из регламента!\nВремя: %s\nРежим регламента: %s\nВремя регламента: %dмин.",
+						doc.Block,
+						time.Now().Format("01/02 15:04"),
+						reglamentName,
+						reglamentTime,
+					))
 			}
 		}
 		time.Sleep(time.Second * 15)

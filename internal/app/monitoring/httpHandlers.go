@@ -18,16 +18,6 @@ type requestMailing struct {
 	} `json:"params"`
 }
 
-//Для добавления нового узла необходимо добавить сюда ключ и представление, а так же добавить элемент в массив documents в файле reglament.json с представлением
-var docMapping = map[string]string{
-	"order":        "Заявка на займ",
-	"prolongation": "Пролонгация",
-	"payment":      "Выдача займа",
-	"refund":       "Погашения",
-	"bankid":       "BankID",
-	"1C":           "1С",
-}
-
 //IndexHandler - index handler
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -41,13 +31,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("error format"))
 		return
 	}
-	reprBlock := docMapping[data.Name]
-	if reprBlock == "" {
-		return
-	}
-	data.Name = reprBlock
-
-	processDocument(&data)
+	processDocument(data)
 
 	resBt, err := json.Marshal(res)
 	if err != nil {
