@@ -13,7 +13,7 @@ type Reglament struct {
 	InReglament        bool      `db:"in_reglament"`
 	ReglamentDayTime   int       `db:"reglament_day_time"`
 	ReglamentNightTime int       `db:"reglament_night_time"`
-	DayHour            int       `db:"day_hour"`
+	DayHour            int       `db:"days_hour"`
 	NightHour          int       `db:"night_hour"`
 }
 
@@ -34,7 +34,17 @@ func (r *Reglament) GetUpdateBlockQuery() string {
 
 func (r *Reglament) GetCreateBlockQuery() string {
 	return `
-	INSERT INTO reglament 
-	(code, block, last_updated, active, in_reglament, reglament_day_time, reglament_night_time, 'day_hour', night_hour, service_block) 
-	VALUES (:code, :block, :last_updated, :active, :in_reglament, :reglament_day_time, :reglament_night_time, :day_hour, :night_hour, :service_block)`
+	INSERT INTO 
+		reglament 
+	SET 
+		code = :code,
+		block = :block,
+		last_updated = :last_updated,
+		active = :active,
+		in_reglament = :in_reglament,
+		reglament_day_time = :reglament_day_time,
+		reglament_night_time = :reglament_night_time,
+		days_hour = :days_hour,
+		night_hour = :night_hour,
+		service_block = :service_block`
 }

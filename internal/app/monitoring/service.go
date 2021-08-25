@@ -2,6 +2,7 @@ package monitoring
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/alexvelfr/Monitoring-go/internal/models"
@@ -23,7 +24,10 @@ func processDocument(doc document) {
 		reglament.NightHour = 22
 		reglament.ReglamentDayTime = 10
 		reglament.ReglamentNightTime = 60
-		store.DbStore.DB.NamedExec(reglament.GetCreateBlockQuery(), reglament)
+		_, err := store.DbStore.DB.NamedExec(reglament.GetCreateBlockQuery(), &reglament)
+		if err != nil {
+			log.Println(err)
+		}
 		return
 	}
 	if !reglament.InReglament {
